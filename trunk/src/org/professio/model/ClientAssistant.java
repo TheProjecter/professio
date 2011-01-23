@@ -243,18 +243,64 @@ public abstract class ClientAssistant implements Runnable, Constants {
 		return true;
 	}
 	
-	public void resetItems(int WriteFrame) {
+	protected void wearItem(final int slot) {
+		final int wearSlot = 3; // weapon slot for now
+		getPlayer().wearItem(getPlayer().getItem(slot), getPlayer().getStack(slot), wearSlot);
+		setEquipment(getPlayer().getItem(slot), getPlayer().getStack(slot), wearSlot);
+		deleteItem(slot);
+	}
+	
+	protected void openBank() {
+		resetItems(5064);
+		sendBank();
+		outStream.createFrame(248);
+		outStream.writeWordA(5292);
+		outStream.writeWord(5063);
+		flushOutStream();
+	}
+	
+	private void sendBank() {
 		outStream.createFrameVarSizeWord(53);
-		outStream.writeWord(WriteFrame);
-		outStream.writeWord(c.playerItems.length);
-		for (int i = 0; i < c.playerItems.length; i++) {
-			if (c.playerItemsN[i] > 254) {
-				outStream.writeByte(255); 		
-				outStream.writeDWord_v2(c.playerItemsN[i]);
+		outStream.writeWord(5382);
+		outStream.writeWord(BANK_SIZE);
+        for (int i = 0; i < BANK_SIZE; i++){
+			if (getPlayer().getBankStack(i) > 254){
+				outStream.writeByte(255);
+				outStream.writeDWord_v2(getPlayer().getBankStack(i));
 			} else {
-				outStream.writeByte(c.playerItemsN[i]);
+				outStream.writeByte(getPlayer().getBankStack(i)); 	
 			}
-			outStream.writeWordBigEndianA(c.playerItems[i]); 
+			outStream.writeWordBigEndianA(getPlayer().getBankItem(i)); 
+		}
+		outStream.endFrameVarSizeWord();
+		flushOutStream();
+	}
+	
+	protected void removeItem(final int slot) {
+		final int wearSlot = 3; // weapon slot for now
+		getPlayer().addItem(getPlayer().getWearing(slot), getPlayer().getWearingStack(slot));
+		getPlayer().removeItem(slot);
+		setEquipment(-1, 0, wearSlot);
+		resetItems(3214);
+	}
+	
+	protected void deleteItem(final int i) {
+		getPlayer().deleteItem(i);
+		resetItems(3214);
+	}
+	
+	public void resetItems(final int i) {
+		outStream.createFrameVarSizeWord(53);
+		outStream.writeWord(i);
+		outStream.writeWord(28);
+		for (int j = 0; j < 28; j++) {
+			if (getPlayer().getStack(j) > 254) {
+				outStream.writeByte(255); 		
+				outStream.writeDWord_v2(getPlayer().getStack(j));
+			} else {
+				outStream.writeByte(getPlayer().getStack(j));
+			}
+			outStream.writeWordBigEndianA(getPlayer().getItem(j) + 1);
 		}
 		outStream.endFrameVarSizeWord();
 		flushOutStream();
@@ -998,7 +1044,7 @@ public abstract class ClientAssistant implements Runnable, Constants {
 
 	public void saveChar() {
 		try {
-			final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("./characters/" + getPlayer().getName() + ".pfc"));
+			final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("./characters/" + getPlayer().getName() + ".pcf"));
 			out.writeObject((PlayerProps) getPlayer());
 			out.close();
 		} catch (Exception e) { /* ignored */ }

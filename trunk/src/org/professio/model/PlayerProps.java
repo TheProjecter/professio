@@ -1,7 +1,6 @@
 package org.professio.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 public abstract class PlayerProps implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -13,5 +12,8 @@ public abstract class PlayerProps implements Serializable {
 	protected int myY;
 	protected int[] myEquipment;
 	protected int[] myEquipStacks;
-	protected HashMap<Integer, Integer> myItems;
+	protected int[] myItems;
+	protected int[] myItemStacks;
+	protected int[] bankItems;
+	protected int[] bankStacks;
 }

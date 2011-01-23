@@ -42,8 +42,11 @@ public class Client extends ClientAssistant {
 
 		for (int i = 0; i < 25; i++)
 			setSkillLevel(i, 1, 0);
-		for (int i = 0; i <= 13; i++)
-			setEquipment(-1, 0, i);
+		for (int i = 0; i <= 13; i++) {
+			if (i == 6 || i == 8 || i == 11)
+				continue;
+			setEquipment(getPlayer().getWearing(i), getPlayer().getWearingStack(i), i);
+		}
 
 		outStream.createFrame(107);
 		setSidebarInterface(1, 3917);
@@ -69,6 +72,7 @@ public class Client extends ClientAssistant {
 		setPrivateMessaging(2);
 		loadPM();
 		updateFriends();
+		resetItems(3214);
 
 		sendMessage("Welcome to Professio Framework.");
 		Update();
@@ -153,6 +157,33 @@ public class Client extends ClientAssistant {
 			addFriend(friend);
 			break;
 			
+		case 41:
+			final int itemID = inStream.readWord();
+			final int itemSlot = inStream.readUnsignedWordA();
+			final int ifID = inStream.readUnsignedWordA();
+			if (getPlayer().getItem(itemSlot) != itemID)
+				break;
+			if (ifID == 3214)
+				wearItem(itemSlot);
+			break;
+			
+		case 145:
+			final int removeIf = inStream.readUnsignedWordA();
+			final int removeSlot = inStream.readUnsignedWordA();
+			final int removeID = inStream.readUnsignedWordA();
+			if (getPlayer().getWearing(removeSlot) != removeID)
+				break;
+			if (removeIf == 1688)
+				removeItem(removeSlot);
+			break;
+			
+		case 214:
+			inStream.readUnsignedWordA();
+			final int itemFrom = inStream.readUnsignedWordA();
+			final int itemTo = inStream.readUnsignedWordA() - 128;
+			getPlayer().swapItems(itemFrom, itemTo);
+			break;
+			
 		default:
 			playerLog("Packet", "Unhandled packet [" + packetType + "]");
 			resetTimer = false;
@@ -188,6 +219,8 @@ public class Client extends ClientAssistant {
 			showInterface(Integer.parseInt(args[1]));
 		} else if (s.equalsIgnoreCase("noclip")) {
 			globalMessage(getPlayer().getName() + " is trying to noclip!");
+		} else if (s.equalsIgnoreCase("bank")) {
+			openBank();
 		} else {
 			sendMessage("Nothing interesting happens.");
 		}

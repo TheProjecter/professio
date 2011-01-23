@@ -72,9 +72,8 @@ public class PlayerManager implements Constants {
 
 	public static int addPlayer(final ClientAssistant c) {
 		final int slot = findSlot();
-		if (slot == -1)
-			return -1;
-		onlinePlayers[slot] = (Client) c;
+		if (slot != -1)
+			onlinePlayers[slot] = (Client) c;
 		return slot;
 	}
 }

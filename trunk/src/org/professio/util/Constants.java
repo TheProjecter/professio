@@ -31,6 +31,7 @@ public interface Constants {
 	public static final int EQUIP_ARROWS = 13;
 	public static final int HOME_X = 3200;
 	public static final int HOME_Y = 3200;
+	public static final int BANK_SIZE = 200;
 	public static final int PACKET_SIZES[] = {
 		0, 0, 0, 1, -1, 0, 0, 0, 0, 0, //0
 		0, 0, 0, 0, 8, 0, 6, 2, 2, 0,  //10

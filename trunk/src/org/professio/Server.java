@@ -44,11 +44,9 @@ public class Server implements Runnable, Constants {
 
 	public void run() {
 		while (true) {
-			final long startTime = System.currentTimeMillis();
+			final long startTime = System.nanoTime();
 			PlayerManager.process();
-			final long timeSpend = System.currentTimeMillis() - startTime;
-			if (timeSpend >= CYCLE_TIME)
-				break;
+			final long timeSpend = (System.nanoTime() - startTime) / 1000000;
 			try {
 				Thread.sleep(CYCLE_TIME - timeSpend);
 			} catch (InterruptedException e) { /* ignored */ }
